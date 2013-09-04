@@ -133,7 +133,7 @@ if(!class_exists('MFI_Reloaded')) {
 			return false;
 		}
 
-		public static function get_image($name, $post_id, $size) {
+		public static function get_image($name, $size, $post_id, $attributes) {
 			return false;
 		}
 	}

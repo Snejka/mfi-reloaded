@@ -62,8 +62,8 @@ function mfi_reloaded_get_image_id($name, $post_id = null) {
  * @return string|boolean An HTML image tag for the chosen image for the queried image picker if an author
  * has selected an image and false otherwise.
  */
-function mfi_reloaded_get_image($name, $post_id = null, $size = 'thumbnail', $attributes = array()) {
-	return apply_filters('mfi_reloaded_get_image', MFI_Reloaded::get_image($name, $post_id, $size, $attributes), $name, $post_id, $size, $attributes);
+function mfi_reloaded_get_image($name, $size = 'thumbnail', $post_id = null, $attributes = array()) {
+	return apply_filters('mfi_reloaded_get_image', MFI_Reloaded::get_image($name, $size, $post_id, $attributes), $name, $size, $post_id, $attributes);
 }
 
 /**
@@ -76,6 +76,6 @@ function mfi_reloaded_get_image($name, $post_id = null, $size = 'thumbnail', $at
  * @return string|boolean An HTML image tag for the chosen image for the queried image picker if an author
  * has selected an image and false otherwise.
  */
-function mfi_reloaded_the_image($name, $post_id = null, $size = 'thumbnail', $attributes = array()) {
-	echo apply_filters('mfi_reloaded_the_template_tag', mfi_reloaded_get_image($name, $post_id, $size, $attributes), $name, $post_id, $size, $attributes);
+function mfi_reloaded_the_image($name, $size = 'thumbnail', $post_id = null, $attributes = array()) {
+	echo apply_filters('mfi_reloaded_the_template_tag', mfi_reloaded_get_image($name, $size, $post_id, $attributes), $name, $size, $post_id, $attributes);
 }
