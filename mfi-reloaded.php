@@ -31,6 +31,7 @@ if(!class_exists('MFI_Reloaded')) {
 
 			if(is_admin()) {
 				add_action('add_meta_boxes', array(__CLASS__, 'add_image_picker_meta_boxes'));
+				add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue_administrative_resources'));
 			} else {
 				// Frontend only actions
 			}
@@ -74,7 +75,21 @@ if(!class_exists('MFI_Reloaded')) {
 			$image_picker_args = $meta_box['args']['image_picker_args'];
 			$image_picker_name = $meta_box['args']['image_picker_name'];
 
+			$image_id = mfi_reloaded_get_image_id($image_picker_name, $post->ID);
+			$image = mfi_reloaded_get_image($image_picker_name, $post->ID, 'full');
+
 			include('views/meta-boxes/image-picker.php');
+		}
+
+		public static function enqueue_administrative_resources() {
+			$screen = get_current_screen();
+
+			if('post' === $screen->base) {
+				wp_enqueue_media();
+
+				wp_enqueue_script('mfi-reloaded', plugins_url('resources/backend/mfi-reloaded.js', __FILE__), array('jquery'), self::VERSION, true);
+				wp_enqueue_style('mfi-reloaded', plugins_url('resources/backend/mfi-reloaded.css', __FILE__), array(), self::VERSION);
+			}
 		}
 
 		/// SHORTCODE CALLBACKS
