@@ -36,7 +36,7 @@ function mfi_reloaded_add_image_picker($name, $args = array()) {
  * @return boolean True if an author has selected an image for the queried image picker and post and false otherwise.
  */
 function mfi_reloaded_has_image($name, $post_id = null) {
-	return apply_filters('mfi_reloaded_has_template_tag', !!(mfi_reloaded_get_image_id()), $name, $post_id);
+	return apply_filters('mfi_reloaded_has_template_tag', !!(mfi_reloaded_get_image_id($name, $post_id)), $name, $post_id);
 }
 
 /**
