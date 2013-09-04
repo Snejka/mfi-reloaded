@@ -30,7 +30,7 @@ if(!class_exists('MFI_Reloaded')) {
 			// Common actions
 
 			if(is_admin()) {
-				// Administrative only actions
+				add_action('add_meta_boxes', array(__CLASS__, 'add_image_picker_meta_boxes'));
 			} else {
 				// Frontend only actions
 			}
@@ -52,7 +52,30 @@ if(!class_exists('MFI_Reloaded')) {
 
 		/// CALLBACKS
 
+		public static function add_image_picker_meta_boxes($post_type) {
+			foreach(self::$image_pickers as $image_picker_name => $image_picker_args) {
+				if(in_array($post_type, $image_picker_args['post_types'])) {
+					add_meta_box(
+						'mfi-reloaded-' . sanitize_title_with_dashes($image_picker_name),
+						$image_picker_args['labels']['name'],
+						array(__CLASS__, 'display_image_picker_meta_box'),
+						$post_type,
+						'side',
+						'default',
+						compact('image_picker_name', 'image_picker_args')
+					);
+				}
+			}
+		}
+
 		/// DISPLAY CALLBACKS
+
+		public static function display_image_picker_meta_box($post, $meta_box) {
+			$image_picker_args = $meta_box['args']['image_picker_args'];
+			$image_picker_name = $meta_box['args']['image_picker_name'];
+
+			include('views/meta-boxes/image-picker.php');
+		}
 
 		/// SHORTCODE CALLBACKS
 
@@ -69,6 +92,8 @@ if(!class_exists('MFI_Reloaded')) {
 				$normalized_args['post_types'] = array('post', 'page');
 			} else if(!is_array($args['post_types'])) {
 				$normalized_args['post_types'] = array($args['post_types']);
+			} else {
+				$normalized_args['post_types'] = $args['post_types'];
 			}
 
 			$default_labels = array(
@@ -85,7 +110,7 @@ if(!class_exists('MFI_Reloaded')) {
 				$normalized_args['labels'] = shortcode_atts($default_labels, $args['labels']);
 			}
 
-			return $normalize_args;
+			return $normalized_args;
 		}
 
 		private static function _redirect($url, $code = 302) {
