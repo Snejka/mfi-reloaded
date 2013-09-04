@@ -28,6 +28,7 @@ if(!class_exists('MFI_Reloaded')) {
 
 		private static function add_actions() {
 			// Common actions
+			add_action('wp_ajax_mfi_reloaded_set_image_id', array(__CLASS__, 'ajax_mfi_reloaded_set_image_id'));
 
 			if(is_admin()) {
 				add_action('add_meta_boxes', array(__CLASS__, 'add_image_picker_meta_boxes'));
@@ -49,6 +50,30 @@ if(!class_exists('MFI_Reloaded')) {
 
 		private static function initialize_defaults() {
 
+		}
+
+		/// AJAX CALLBACKS
+
+		public static function ajax_mfi_reloaded_set_image_id() {
+			$data = stripslashes_deep($_REQUEST);
+
+			$image_id = $data['image_id'];
+			$name = $data['name'];
+			$post_id = $data['post_id'];
+
+			if($post_id && current_user_can('edit_post', $post_id)) {
+				$images = self::_get_meta($post_id);
+
+				if(empty($image_id)) {
+					unset($images[$name]);
+				} else {
+					$images[$name] = $image_id;
+				}
+
+				self::_set_meta($post_id, $images);
+			}
+
+			exit;
 		}
 
 		/// CALLBACKS
@@ -76,7 +101,7 @@ if(!class_exists('MFI_Reloaded')) {
 			$image_picker_name = $meta_box['args']['image_picker_name'];
 
 			$image_id = mfi_reloaded_get_image_id($image_picker_name, $post->ID);
-			$image = mfi_reloaded_get_image($image_picker_name, $post->ID, 'full');
+			$image = mfi_reloaded_get_image($image_picker_name, 'full', $post->ID);
 
 			include('views/meta-boxes/image-picker.php');
 		}
@@ -96,7 +121,25 @@ if(!class_exists('MFI_Reloaded')) {
 
 		/// POST META
 
-		/// SETTINGS
+		private static function _get_meta($post_id, $meta_key = null) {
+			$post_id = empty($post_id) && in_the_loop() ? get_the_ID() : $post_id;
+
+			$meta = get_post_meta($post_id, 'rfi-reloaded-images', true);
+
+			if(!is_array($meta)) {
+				$meta = array();
+			}
+
+			return is_null($meta_key) ? $meta : (isset($meta[$meta_key]) ? $meta[$meta_key] : false);
+		}
+
+		private static function _set_meta($post_id, $meta) {
+			$post_id = empty($post_id) && in_the_loop() ? get_the_ID() : $post_id;
+
+			update_post_meta($post_id, 'rfi-reloaded-images', $meta);
+
+			return $meta;
+		}
 
 		/// UTILITY
 
@@ -145,10 +188,16 @@ if(!class_exists('MFI_Reloaded')) {
 		}
 
 		public static function get_image_id($name, $post_id) {
-			return false;
+			return self::_get_meta($post_id, $name);
 		}
 
 		public static function get_image($name, $size, $post_id, $attributes) {
+			$image_id = self::get_image_id($name, $post_id);
+
+			if($image_id) {
+				return wp_get_attachment_image($image_id, $size, false, $attributes);
+			}
+
 			return false;
 		}
 	}

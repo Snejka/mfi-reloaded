@@ -15,12 +15,10 @@ jQuery(document).ready(function($) {
 			{
 				action: 'mfi_reloaded_set_image_id',
 				image_id: 0,
-				name: name
+				name: _name,
+				post_id: $('#post_ID').val()
 			},
-			function(data, status) {
-
-			},
-			'json'
+			function(data, status) { }
 		);
 
 		// Hide the link that allows a user to remove the image
@@ -74,16 +72,20 @@ jQuery(document).ready(function($) {
 				{
 					action: 'mfi_reloaded_set_image_id',
 					image_id: media_attachment.id,
-					name: name
+					name: _name,
+					post_id: $('#post_ID').val()
 				},
-				function(data, status) {
-
-				},
-				'json'
+				function(data, status) { }
 			);
 
 			// Add the image to the preview container
 			$preview.append($('<img />').attr('src', media_attachment.sizes.full.url).attr('alt', media_attachment.title));
+
+			// Show the remove link
+			$remove.show();
+
+			// Hide the set link
+			$set.hide();
 		});
 
 		mfi_reloaded_frame.open();
@@ -93,7 +95,8 @@ jQuery(document).ready(function($) {
 		var $container = $(element),
 			$preview = $container.children('.mfi-reloaded-image-picker-preview'),
 			$remove = $container.children('.mfi-reloaded-image-picker-remove'),
-			$set = $container.children('.mfi-reloaded-name-image-picker-set');
+			$set = $container.children('.mfi-reloaded-image-picker-set');
+
 
 		if(0 === $preview.children().size()) {
 			$remove.hide();
