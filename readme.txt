@@ -28,8 +28,8 @@ This plugin allows developers to easily register additional image pickers for an
 Easy! In your theme's functions.php file, add the following code:
 
 `function register_custom_image_pickers() {
-	if(function_exists('mfi_reloaded_add_image_picker')) {
-		mfi_reloaded_add_image_picker('hero-image', array(
+	add_theme_support('mfi-reloaded', array(
+		'hero-image' => array(
 			'post_types' => array('post'),
 			'labels' => array(
 				'name' => __('Hero Image'),
@@ -38,9 +38,8 @@ Easy! In your theme's functions.php file, add the following code:
 				'popup_title' => __('Set Hero Image'),
 				'popup_select' => __('Set hero image'),
 			),
-		));
-
-		mfi_reloaded_add_image_picker('sidekick-image', array(
+		),
+		'sidekick-image' => array(
 			'post_types' => array('post'),
 			'labels' => array(
 				'name' => __('Sidekick Image'),
@@ -49,23 +48,29 @@ Easy! In your theme's functions.php file, add the following code:
 				'popup_title' => __('Set Sidekick Image'),
 				'popup_select' => __('Set sidekick image'),
 			),
-		));
-	}
+		),
+	));
 }
-add_action('init', 'register_custom_image_pickers');`
+add_action('after_setup_theme', 'register_custom_image_pickers');`
 
 Feel free to provide whatever values you need.
 
-An answer to that question.
-
 == Changelog ==
 
-= 1.0 =
+= 1.0.0 = 
+
+* Changed from using a custom template tag for adding image pickers to the WordPress function `add_theme_support`
+
+= 1.0.0-RC1 =
 
 * Initial release
 
 == Upgrade Notice ==
 
-= 1.0 =
+= 1.0.0 =
+
+If you were previously using the `mfi_reloaded_add_image_picker` template tag to add image pickers, you should switch to the new `add_theme_support` method.
+
+= 1.0.0-RC1 =
 
 Initial release.
