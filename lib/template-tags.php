@@ -1,13 +1,9 @@
 <?php
 
 /**
- * Register a new image picker. Do not use before init or after add_meta_boxes.
- *
- * A function for adding a custom image picker to any post type. This
- * function accepts an identifier string (required) and an optional array
- * which controls the behavior of the image picker.
- *
- * Optional $args contents:
+ * To register a new image picker, use add_theme_support('mfi-reloaded', $pickers), where
+ * $pickers is an associative array of $image_picker_name => $image_picker_args. $image_picker_args
+ * is an array which can have the following contents:
  *
  * - post_types - An array of post_type keys on which this image picker should appear
  * - labels - An array with the following keys
@@ -16,16 +12,7 @@
  *     * remove - Text displayed to the user inside of the image picker meta box after an image is selected. Defaults to "Removed featured image".
  *     * popup_title - Text displayed in the title area of the media picker popup. Defaults to "Set Featured Image".
  *     * popup_select - Text displayed in the selection button of the media picker popup. Defaults to "Set featured image".
- *
- * @param string $name A unique string which identifies the image picker - you will use this when displaying the image
- * @param array $args An array of arguments that modify the behavior of the picker
- * @return boolean True if the image picker was added successful and false otherwise.
  */
-function mfi_reloaded_add_image_picker($name, $args = array()) {
-	$args = apply_filters('mfi_reloaded_add_image_picker', $args);
-
-	return MFI_Reloaded::add_image_picker($name, $args);
-}
 
 /**
  * Returns a boolean value indicating whether an author has selected an image

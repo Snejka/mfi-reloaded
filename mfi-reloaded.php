@@ -2,23 +2,16 @@
 /*
  Plugin Name: Multiple Featured Images: Reloaded
  Plugin URI: https://github.com/nickohrn/mfi-reloaded
- Description: Here is a short description of the plugin. This should be no more than 150 characters. No markup here.
- Version: 1.0.0-RC1
+ Description: Allows developers to quickly add new image pickers to any content type.
+ Version: 1.0.0
  Author: Nick Ohrn of Plugin-Developer.com
  Author URI: http://plugin-developer.com/
  */
 
 if(!class_exists('MFI_Reloaded')) {
 	class MFI_Reloaded {
-		/// CONSTANTS
-
-		//// VERSION
-		const VERSION = '1.0.0-RC1';
-
-		//// KEYS
-
-		/// DATA STORAGE
-		private static $image_pickers = array();
+		/// Version
+		const VERSION = '1.0.0';
 
 		public static function init() {
 			self::add_actions();
@@ -52,7 +45,7 @@ if(!class_exists('MFI_Reloaded')) {
 
 		}
 
-		/// AJAX CALLBACKS
+		/// AJAX Callbacks
 
 		public static function ajax_mfi_reloaded_set_image_id() {
 			$data = stripslashes_deep($_REQUEST);
@@ -76,10 +69,16 @@ if(!class_exists('MFI_Reloaded')) {
 			exit;
 		}
 
-		/// CALLBACKS
+		/// Callbacks
 
 		public static function add_image_picker_meta_boxes($post_type) {
-			foreach(self::$image_pickers as $image_picker_name => $image_picker_args) {
+			$support = get_theme_support('mfi-reloaded');
+
+			$pickers = is_array($support) && isset($support[0]) && is_array($support[0]) ? $support[0] : array();
+
+			foreach($pickers as $image_picker_name => $image_picker_args) {
+				$image_picker_args = self::_normalize_args($image_picker_args);
+
 				if(in_array($post_type, $image_picker_args['post_types'])) {
 					add_meta_box(
 						'mfi-reloaded-' . sanitize_title_with_dashes($image_picker_name),
@@ -94,18 +93,6 @@ if(!class_exists('MFI_Reloaded')) {
 			}
 		}
 
-		/// DISPLAY CALLBACKS
-
-		public static function display_image_picker_meta_box($post, $meta_box) {
-			$image_picker_args = $meta_box['args']['image_picker_args'];
-			$image_picker_name = $meta_box['args']['image_picker_name'];
-
-			$image_id = mfi_reloaded_get_image_id($image_picker_name, $post->ID);
-			$image = mfi_reloaded_get_image($image_picker_name, 'full', $post->ID);
-
-			include('views/meta-boxes/image-picker.php');
-		}
-
 		public static function enqueue_administrative_resources() {
 			$screen = get_current_screen();
 
@@ -117,14 +104,24 @@ if(!class_exists('MFI_Reloaded')) {
 			}
 		}
 
-		/// SHORTCODE CALLBACKS
+		/// Display callbacks
 
-		/// POST META
+		public static function display_image_picker_meta_box($post, $meta_box) {
+			$image_picker_args = $meta_box['args']['image_picker_args'];
+			$image_picker_name = $meta_box['args']['image_picker_name'];
+
+			$image_id = mfi_reloaded_get_image_id($image_picker_name, $post->ID);
+			$image = mfi_reloaded_get_image($image_picker_name, 'full', $post->ID);
+
+			include('views/meta-boxes/image-picker.php');
+		}
+
+		/// Post meta
 
 		private static function _get_meta($post_id, $meta_key = null) {
 			$post_id = empty($post_id) && in_the_loop() ? get_the_ID() : $post_id;
 
-			$meta = get_post_meta($post_id, 'rfi-reloaded-images', true);
+			$meta = get_post_meta($post_id, 'mfi-reloaded-images', true);
 
 			if(!is_array($meta)) {
 				$meta = array();
@@ -136,12 +133,12 @@ if(!class_exists('MFI_Reloaded')) {
 		private static function _set_meta($post_id, $meta) {
 			$post_id = empty($post_id) && in_the_loop() ? get_the_ID() : $post_id;
 
-			update_post_meta($post_id, 'rfi-reloaded-images', $meta);
+			update_post_meta($post_id, 'mfi-reloaded-images', $meta);
 
 			return $meta;
 		}
 
-		/// UTILITY
+		/// Utility
 
 		private static function _normalize_args($args) {
 			$normalized_args = array();
@@ -171,21 +168,7 @@ if(!class_exists('MFI_Reloaded')) {
 			return $normalized_args;
 		}
 
-		private static function _redirect($url, $code = 302) {
-			wp_redirect($url, $code); exit;
-		}
-
-		//// LINKS
-
-		/// TEMPLATE TAGS
-
-		public static function add_image_picker($name, $args) {
-			if(!is_string($name) || isset(self::$image_pickers[$name])) {
-				return false;
-			}
-
-			self::$image_pickers[$name] = self::_normalize_args($args);
-		}
+		/// Template tags
 
 		public static function get_image_id($name, $post_id) {
 			return self::_get_meta($post_id, $name);
